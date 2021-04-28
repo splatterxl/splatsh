@@ -35,6 +35,7 @@ export async function findInPath(command: string): Promise<string | null> {
   });
 }
 
+// TODO: handle $()
 export function parseArgs(str: string) {
   const args = [] as string[];
   let currentArg = "";

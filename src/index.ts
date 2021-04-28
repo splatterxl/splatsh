@@ -3,7 +3,6 @@ import { Lex } from "jvar";
 import { ExitCodes } from './constants';
 import { CommandHandler } from "./handleCommand";
 import { sessionVariables } from './sessionVariables';
-import { CommandResult } from './types';
 import { parseArgs, prompt } from './util';
 
 CommandHandler.prepare().then(() => {
@@ -30,7 +29,14 @@ export const shellFlags = new Lex(
 };
 
 async function handleTypedData() {
-  const args = parseArgs(typing);
+  let args;
+  try {
+    args = parseArgs(typing);
+  } catch (err) {
+    printf(err + "\n");
+    return promptShell("~", ExitCodes.ERROR);
+  }
+
   typing = "";
 
   let commandVariables = {} as Record<string, string>;

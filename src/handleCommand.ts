@@ -16,7 +16,6 @@ export class CommandHandler extends Handler {
     }
   }
   static async invoke(args: string[], variables: Record<string, string>): Promise<{ out: string, code: NodeJS.Signals | ExitCodes }> {
-    // TODO: Properly handle "", '' and $() and expand variables
     let commandName = args.shift();
     if (commandName in CommandHandler.inbuiltCommands)
       return new CommandHandler.inbuiltCommands[commandName]()
