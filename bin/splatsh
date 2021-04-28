@@ -1,0 +1,2 @@
+#!/usr/bin/node
+require("../share/splatsh/build/index.js")
