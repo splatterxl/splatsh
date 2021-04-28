@@ -41,7 +41,7 @@ async function handleTypedData() {
 
   let commandVariables = {} as Record<string, string>;
 
-  while (args.length && /\w+=\w+/.test(args[0])) {
+  while (args.length && /\w+=[^\s]+/.test(args[0])) {
     const [key, value] = args.shift().split("=");
     commandVariables[key] = value;
   }
