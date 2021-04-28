@@ -1,7 +1,7 @@
-import { prompt } from "./util";
 import chalk from "chalk";
 import { Lex } from "jvar";
 import { CommandHandler } from "./handleCommand";
+import { prompt } from "./util";
 
 CommandHandler.prepare().then(() => {
   printf(

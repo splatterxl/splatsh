@@ -1,5 +1,6 @@
 import { Lex } from "jvar";
 import { CommandHandler } from "./handleCommand";
+import { CommandResult, PotentialPromise } from "./types";
 
 export class Handler {
   static invoke(..._: any[]) {
@@ -7,7 +8,7 @@ export class Handler {
   }
 }
 
-export class InbuiltCommand<T extends object = Record<string, Function>> {
+export abstract class InbuiltCommand<T extends object = Record<string, Function>> {
   constructor() {}
   flags: T;
   flagAliases: Record<string, keyof T>;
@@ -23,12 +24,5 @@ export class InbuiltCommand<T extends object = Record<string, Function>> {
     this.context = handler;
     return this;
   }
-  invoke() {
-    return {
-      out: `${this.constructor.name.replace(/^[A-Z]/g, (v) =>
-        v.toLowerCase()
-      )}: not implemented`,
-      code: 1,
-    };
-  }
+  abstract invoke(): PotentialPromise<CommandResult>;
 }
