@@ -15,14 +15,12 @@ export class CommandHandler extends Handler {
       this.inbuiltCommands[file] = data.default;
     }
   }
-  static async invoke(data: string): Promise<{ out: string, code: NodeJS.Signals | ExitCodes }> {
+  static async invoke(args: string[], variables: Record<string, string>): Promise<{ out: string, code: NodeJS.Signals | ExitCodes }> {
     // TODO: Properly handle "", '' and $() and expand variables
-    let [commandName, ...args] = data.split(/\s+/);
-    if (CommandHandler.isSyntaxError(data))
-      return { out: "syntax error: unexpected end of input\n", code: ExitCodes.BUILTIN_MISUSE };
+    let commandName = args.shift();
     if (commandName in CommandHandler.inbuiltCommands)
       return new CommandHandler.inbuiltCommands[commandName]()
-        .prepare(this, args)
+        .prepare(this, args, variables)
         .invoke();
     try {
       const input = commandName;
@@ -33,13 +31,15 @@ export class CommandHandler extends Handler {
       return { out: err, code: ExitCodes.ERROR };
     }
     return new Promise((r) => {
-      const child = spawn(commandName + " " + args.join(" "), { shell: true });
+      const child = spawn(
+        `${Object.entries(variables)
+          .map(([key, value]) => `${key}="${value}"`)
+          .join(" ")} ${commandName} ${args.map(arg => `"${arg}"`).join(" ")}`,
+        { shell: true }
+      );
       child.stdout.on("data", (d) => process.stdout.write(d.toString()));
       child.on("exit", (code, signal) => r({ out: "", code: code || signal }));
     });
-  }
-  static isSyntaxError(str: string) {
-    return /(^&$|^function\s*$|^fn\s*$)/.test(str);
   }
   static inbuiltCommands: Record<string, new () => InbuiltCommand> = {};
 }

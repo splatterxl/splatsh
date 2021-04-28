@@ -2,7 +2,9 @@ import chalk from "chalk";
 import { Lex } from "jvar";
 import { ExitCodes } from './constants';
 import { CommandHandler } from "./handleCommand";
-import { prompt } from "./util";
+import { sessionVariables } from './sessionVariables';
+import { CommandResult } from './types';
+import { parseArgs, prompt } from './util';
 
 CommandHandler.prepare().then(() => {
   printf(
@@ -28,9 +30,26 @@ export const shellFlags = new Lex(
 };
 
 async function handleTypedData() {
-  const result = await CommandHandler.invoke(typing);
-  printf(result.out);
+  const args = parseArgs(typing);
   typing = "";
+
+  let commandVariables = {} as Record<string, string>;
+
+  while (args.length && /\w+=\w+/.test(args[0])) {
+    const [key, value] = args.shift().split("=");
+    commandVariables[key] = value;
+  }
+
+  if (!args.length) {
+    for (const [key, value] of Object.entries(commandVariables)) {
+      sessionVariables.set(key, value);
+    }
+    return promptShell("~", ExitCodes.SUCCESS);
+  }
+
+  const result = await CommandHandler.invoke(args, commandVariables);
+
+  printf(result.out);
   promptShell("~", result.code);
 }
 
@@ -39,6 +58,7 @@ process.stdin.on("data", (data) => {
   typing = data.toString().slice(0, -1) || "";
   handleTypedData();
 });
+
 process.on("SIGSEGV", () => {
   process.stdout.write("Segmentation fault. Killing process.");
   process.exit(7);
