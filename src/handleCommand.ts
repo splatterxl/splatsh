@@ -39,5 +39,5 @@ export class CommandHandler extends Handler {
   static isSyntaxError(str: string) {
     return /(^&$|^function\s*$|^fn\s*$)/.test(str);
   }
-  static inbuiltCommands: Record<string, typeof import("./commands/exit").default> = {};
+  static inbuiltCommands: Record<string, new () => InbuiltCommand> = {};
 }
