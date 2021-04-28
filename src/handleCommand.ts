@@ -16,6 +16,7 @@ export class CommandHandler extends Handler {
     }
   }
   static async invoke(data: string): Promise<{ out: string, code: NodeJS.Signals | ExitCodes }> {
+    // TODO: Properly handle "", '' and $() and expand variables
     let [commandName, ...args] = data.split(/\s+/);
     if (CommandHandler.isSyntaxError(data))
       return { out: "syntax error: unexpected end of input\n", code: ExitCodes.BUILTIN_MISUSE };
@@ -24,8 +25,9 @@ export class CommandHandler extends Handler {
         .prepare(this, args)
         .invoke();
     try {
+      const input = commandName;
       commandName = await findInPath(commandName);
-      if (!commandName) return { out: `${commandName}: command not found\n`, code: ExitCodes.COMMAND_NOT_FOUND };
+      if (!commandName) return { out: `${input}: command not found\n`, code: ExitCodes.COMMAND_NOT_FOUND };
     } catch (err) {
       if (typeof err !== "string") return { out: `An unknown error occurred`, code: ExitCodes.UNKNOWN_ERROR }
       return { out: err, code: ExitCodes.ERROR };

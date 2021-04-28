@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { Lex } from "jvar";
+import { ExitCodes } from './constants';
 import { CommandHandler } from "./handleCommand";
 import { prompt } from "./util";
 
@@ -41,6 +42,11 @@ process.stdin.on("data", (data) => {
 process.on("SIGSEGV", () => {
   process.stdout.write("Segmentation fault. Killing process.");
   process.exit(7);
+});
+
+process.on("SIGINT", () => {
+  printf("\n");
+  promptShell("~", ExitCodes.CTLR_C);
 });
 
 function printf(str: string) {

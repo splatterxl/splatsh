@@ -33,3 +33,9 @@ export async function findInPath(command: string): Promise<string | null> {
       .catch(reject);
   });
 }
+
+export function resolveVariable(key: string) {
+  // TODO: Should also check variables not in PATH once this is implemented in splatsh
+
+  return process.env[key];
+}
