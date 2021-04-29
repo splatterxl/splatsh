@@ -8,9 +8,9 @@
     "format": "prettier -w src",
     "format-staged": "precise-commits",
     "lint": "eslint ./src/**/*.ts",
-    "lint:fix": "npm run lint --fix",
+    "lint:fix": "yarn lint --fix",
     "prepare": "echo \"Initialising git hooks...\" && git config --local core.hooksPath .hooks/",
-    "test": "npm run build && npm run lint",
+    "test": "yarn build && yarn lint",
     "start": "node build/index.js"
   },
   "author": "",
