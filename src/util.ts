@@ -61,7 +61,7 @@ export function parseArgs(str: string) {
   }
 
   loop: for (const char of str) {
-    if (escapingNext || (insideSingleQuotes && char !== "'")) {
+    if (escapingNext || (insideSingleQuotes && char !== `'`)) {
       currentArg += char;
       continue;
     }
@@ -80,19 +80,24 @@ export function parseArgs(str: string) {
         break;
       case "}":
         if (resolvingVariable) {
-          currentArg += resolveVariable(currentVariable);
+          currentArg += resolveVariable(currentVariable) ?? "";
           resolvingVariable = false;
           currentVariable = "";
         } else pushChar(char);
         break;
-      case '"':
+      case `"`:
         insideDoubleQuotes = !insideDoubleQuotes;
         break;
-      case "'":
+      case `'`:
         insideSingleQuotes = !insideSingleQuotes;
         break;
       case " ":
-        if (insideDoubleQuotes || insideSingleQuotes) pushChar(char);
+        if (resolvingVariable) {
+          currentArg += resolveVariable(currentVariable) ?? "";
+          resolvingVariable = false;
+          currentVariable = "";
+          pushChar(char);
+        } else if (insideDoubleQuotes) pushChar(char);
         else if (!resolvingVariable && !currentArg) break;
         else pushArg();
         break;
