@@ -17,6 +17,6 @@ export default class Which extends InbuiltCommand {
         if (result) return { out: `${result}\n`, code: ExitCodes.SUCCESS };
         return { out: `${commandName} not found\n`, code: ExitCodes.COMMAND_NOT_FOUND };
       })
-      .catch(err => ({ out: err, code: ExitCodes.ERROR }));
+      .catch(err => ({ out: err + "\n", code: ExitCodes.ERROR }));
   }
 }

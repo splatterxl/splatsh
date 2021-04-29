@@ -1,7 +1,5 @@
-import chalk from "chalk";
 import { spawn } from "child_process";
 import { readdirSync } from "fs";
-import { shellFlags } from ".";
 import { Handler, InbuiltCommand } from "./classes";
 import { ExitCodes } from './constants';
 import { findInPath } from "./util";
@@ -10,8 +8,6 @@ export class CommandHandler extends Handler {
     for (let file of readdirSync(__dirname + "/commands")) {
       const data = await import(__dirname + "/commands/" + file);
       file = file.replace(/\.js$/, "");
-      if (shellFlags.flags.debug)
-        process.stdout.write(chalk`Loaded inbuilt command {bold ${file}}\n`);
       this.inbuiltCommands[file] = data.default;
     }
   }

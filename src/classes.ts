@@ -1,4 +1,3 @@
-import { Lex } from "jvar";
 import { CommandHandler } from "./handleCommand";
 import { CommandResult, PotentialPromise } from "./types";
 import { resolveVariable } from "./util";
@@ -22,10 +21,7 @@ export abstract class InbuiltCommand<T extends object = Record<string, Function>
     return Object.prototype.hasOwnProperty.call(this.variables, key) ? this.variables[key] : resolveVariable(key);
   }
   prepare(handler = CommandHandler, args: string[], variables: Record<string, string>) {
-    const lexer = new Lex(this.flags, this.flagAliases);
-    const result = lexer.lex(args.join(" "));
-    this.args = result.args;
-    this.parsedFlags = result.flags;
+    this.args = args;
     this.context = handler;
     this.variables = variables;
     return this;

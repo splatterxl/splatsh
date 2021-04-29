@@ -4,11 +4,9 @@ specifiers:
   '@splatterxl/tsconfig': ^1.0.0
   '@types/node': ^15.0.1
   chalk: ^4.1.1
-  jvar: github:Zytekaron/jvar.js
 
 dependencies:
   chalk: 4.1.1
-  jvar: github.com/Zytekaron/jvar.js/35d0eeb3f1397cfa28522370cdd5364701032b2b
 
 devDependencies:
   '@splatterxl/tsconfig': 1.0.0
@@ -55,21 +53,9 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  /lodash/4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: false
-
   /supports-color/7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
     dependencies:
       has-flag: 4.0.0
-    dev: false
-
-  github.com/Zytekaron/jvar.js/35d0eeb3f1397cfa28522370cdd5364701032b2b:
-    resolution: {tarball: https://codeload.github.com/Zytekaron/jvar.js/tar.gz/35d0eeb3f1397cfa28522370cdd5364701032b2b}
-    name: jvar
-    version: 1.5.2
-    dependencies:
-      lodash: 4.17.21
     dev: false

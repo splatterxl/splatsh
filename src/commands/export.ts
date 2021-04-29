@@ -1,7 +1,7 @@
 import { InbuiltCommand } from "../classes";
 import { ExitCodes } from "../constants";
 
-export default class Which extends InbuiltCommand {
+export default class Export extends InbuiltCommand {
   declare usage: "KEY=VALUE";
   async invoke() {
     if (!this.args.length)
