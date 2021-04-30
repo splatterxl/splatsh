@@ -10,14 +10,12 @@ transpile:
 run: transpile
 	node .
 
-install-share:
+install-share: transpile
 	mkdir -p $(PREFIX)/share/splatsh/node_modules
-	install -m 0644 package.json $(PREFIX)/share/splatsh/package.json
-	(cd $(PREFIX)/share/splatsh && npm i)
-	install -m 0644 tsconfig.json $(PREFIX)/share/splatsh/tsconfig.json
+	jq "{ dependencies }" < package.json > $(PREFIX)/share/splatsh/package.json
+	npm i --only=production --prefix $(PREFIX)/share/splatsh
 	# this should be install but idk how to do dirs lol
-	cp -r src $(PREFIX)/share/splatsh/src
-	tsc -p $(PREFIX)/share/splatsh/tsconfig.json
+	cp -r build/* $(PREFIX)/share/splatsh/
 
 install-bin: bin/splatsh
 	mkdir -p $(PREFIX)/$(dir $<)
