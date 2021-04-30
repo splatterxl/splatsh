@@ -2,14 +2,13 @@ import { InbuiltCommand } from "../classes";
 import { ExitCodes } from "../constants";
 
 export default class Export extends InbuiltCommand {
-  declare usage: "KEY=VALUE";
-  async invoke() {
+  public usage = "export KEY=VALUE...";
+  public async invoke() {
     if (!this.args.length)
       return {
-        out:
-          Object.entries(process.env)
-            .map(([key, value]) => `${key}=${value}`)
-            .join("\n") + "\n",
+        out: `${Object.entries(process.env)
+          .map(([key, value]) => `${key}=${value}`)
+          .join("\n")}\n`,
         code: ExitCodes.SUCCESS
       };
 
