@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require("../share/splatsh/build/index.js")
+require("../share/splatsh/index.js")
