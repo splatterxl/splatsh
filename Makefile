@@ -12,7 +12,7 @@ run: transpile
 
 install-share: transpile
 	mkdir -p $(PREFIX)/share/splatsh/node_modules
-	jq "{ dependencies }" < package.json > $(PREFIX)/share/splatsh/package.json
+	node -e 'console.log(JSON.stringify({ dependencies: require("./package.json").dependencies }))' > $(PREFIX)/share/splatsh/package.json
 	npm i --only=production --prefix $(PREFIX)/share/splatsh
 	# this should be install but idk how to do dirs lol
 	cp -r build/* $(PREFIX)/share/splatsh/
