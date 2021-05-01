@@ -2,6 +2,7 @@ import { spawn } from "child_process";
 import { readdirSync } from "fs";
 import { Handler, InbuiltCommand } from "./classes";
 import { ExitCodes } from "./constants";
+import { CommandResult } from "./types";
 import { findInPath } from "./util";
 
 export class CommandHandler implements Handler {
@@ -15,10 +16,7 @@ export class CommandHandler implements Handler {
     }
   }
 
-  public static async invoke(
-    args: string[],
-    variables: Record<string, string>
-  ): Promise<{ out: string; code: NodeJS.Signals | ExitCodes }> {
+  public static async invoke(args: string[], variables: Record<string, string>): Promise<CommandResult> {
     let commandName = args.shift();
     if (commandName in CommandHandler.inbuiltCommands)
       return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables).invoke();
@@ -37,8 +35,19 @@ export class CommandHandler implements Handler {
           .join(" ")} ${commandName} ${args.map(arg => `"${arg}"`).join(" ")}`,
         { shell: true }
       );
+      const isRaw = process.stdin.isRaw;
+      process.stdin.setRawMode(false);
+      function writeToChild(d: Buffer) {
+        child.stdin.write(d);
+      }
+      process.stdin.on("data", writeToChild);
       child.stdout.on("data", d => process.stdout.write(d.toString()));
-      child.on("exit", (code, signal) => r({ out: "", code: code || signal }));
+      child.stderr.on("data", d => process.stderr.write(d.toString()));
+      child.on("exit", (code, signal) => {
+        process.stdin.off("data", writeToChild);
+        process.stdin.setRawMode(isRaw);
+        r({ out: "", code: code || signal });
+      });
     });
   }
 }

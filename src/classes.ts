@@ -9,13 +9,9 @@ export class Handler {
 }
 
 /* TODO: what should these types be? */
-export abstract class InbuiltCommand<
-  Flags extends Record<string, unknown> = Record<string, (...args: unknown[]) => unknown>
-> {
+export abstract class InbuiltCommand {
   public abstract readonly usage: string;
-  public flags: Flags;
   public variables: Record<string, string>;
-  public flagAliases: Record<string, keyof Flags>;
   public args: string[];
   public context: typeof CommandHandler;
   public parsedFlags: Record<string, any>;

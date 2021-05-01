@@ -4,7 +4,7 @@ import { format } from "util";
 import { sessionVariables } from "./sessionVariables";
 
 export function prompt(hook: (prompt: string) => void, context = "") {
-  hook(`${context}$> `);
+  hook(`${context || ""}$> `);
 }
 
 export async function findInPath(command: string): Promise<string | null> {
