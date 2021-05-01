@@ -1,4 +1,6 @@
 #!/bin/sh
 set -ex
 
-npm run format-staged && npm run test
+scripts/licenser/licenser.sh
+yarn format-staged
+yarn test
