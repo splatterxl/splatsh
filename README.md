@@ -1,4 +1,6 @@
 # Splatsh
+[![Tests](https://github.com/nearlySplat/splatsh/actions/workflows/test.yml/badge.svg?branch=development)](https://github.com/nearlySplat/splatsh/actions/workflows/test.yml) [![Dependencies](https://david-dm.org/nearlysplat/splatsh.svg)](https://github.com/nearlysplat/splatsh/blob/development/package.json)
+
 The [Node.js](https://nodejs.org)-based command-line shell for everyone!
 
 ## Why. Just why. Another shell?
