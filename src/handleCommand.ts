@@ -35,7 +35,7 @@ export class CommandHandler implements Handler {
           .join(" ")} ${commandName} ${args.map(arg => `"${arg}"`).join(" ")}`,
         { shell: true }
       );
-      const isRaw = process.stdin.isRaw;
+      const {isRaw} = process.stdin;
       process.stdin.setRawMode(false);
       function writeToChild(d: Buffer) {
         child.stdin.write(d);
