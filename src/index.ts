@@ -46,8 +46,8 @@ function promptShell(loc?: string, code?: number | NodeJS.Signals) {
 }
 
 async function handleTypedData() {
-  const [, setOccupied] = useOccupiedState();
-  setOccupied(true);
+  if (occupied) return;
+  else occupied = true;
   let args;
   try {
     args = parseArgs(typing);
@@ -74,18 +74,18 @@ async function handleTypedData() {
 
   const result = await CommandHandler.invoke(args, commandVariables);
   printf(result.out);
-  setOccupied(false);
+  printf(result.err || "");
+  occupied = false;
   promptShell("~", result.code);
 }
-
 process.stdin.on("data", data => {
-  if (occupied) return;
   if (data.toString() === "\n") return promptShell("~", 0);
   typing = data.toString().slice(0, -1) || "";
   void handleTypedData();
 });
 
 process.on("SIGINT", () => {
-  printfErr("\n");
-  promptShell("~", ExitCodes.CTLR_C);
+  comment: {
+    break comment;
+  }
 });
