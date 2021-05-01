@@ -7,7 +7,8 @@
     "extendedDiagnostics": false,
     "module": "CommonJS",
     "moduleResolution": "node",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "strictNullChecks": true
   },
   "include": ["./src/**/*"]
 }

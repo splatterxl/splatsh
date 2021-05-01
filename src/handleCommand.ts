@@ -24,7 +24,7 @@ import { CommandResult } from "./types";
 import { findInPath } from "./util";
 
 export class CommandHandler implements Handler {
-  public static inbuiltCommands: Record<string, new () => InbuiltCommand> = {};
+  public static inbuiltCommands: Record<string, new () => InbuiltCommand> = Object.create(null);
 
   public static async prepare() {
     for (let file of readdirSync(`${__dirname}/commands`)) {
@@ -35,12 +35,12 @@ export class CommandHandler implements Handler {
   }
 
   public static async invoke(args: string[], variables: Record<string, string>): Promise<CommandResult> {
-    let commandName = args.shift();
+    let commandName = args.shift() as typeof args[0];
     if (commandName in CommandHandler.inbuiltCommands)
       return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables).invoke();
     try {
       const input = commandName;
-      commandName = await findInPath(commandName);
+      commandName = (await findInPath(commandName)) as string;
       if (!commandName) return { out: `${input}: command not found\n`, code: ExitCodes.COMMAND_NOT_FOUND };
     } catch (err) {
       if (typeof err !== "string") return { out: `An unknown error occurred`, code: ExitCodes.UNKNOWN_ERROR };
@@ -53,7 +53,7 @@ export class CommandHandler implements Handler {
           .join(" ")} ${commandName} ${args.map(arg => `"${arg}"`).join(" ")}`,
         { shell: true }
       );
-      const {isRaw} = process.stdin;
+      const { isRaw } = process.stdin;
       process.stdin.setRawMode(false);
       function writeToChild(d: Buffer) {
         child.stdin.write(d);
@@ -64,7 +64,7 @@ export class CommandHandler implements Handler {
       child.on("exit", (code, signal) => {
         process.stdin.off("data", writeToChild);
         process.stdin.setRawMode(isRaw);
-        r({ out: "", code: code || signal });
+        r({ out: "", code: code || signal || 0 });
       });
     });
   }

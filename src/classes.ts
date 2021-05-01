@@ -29,10 +29,9 @@ export class Handler {
 /* TODO: what should these types be? */
 export abstract class InbuiltCommand {
   public abstract readonly usage: string;
-  public variables: Record<string, string>;
-  public args: string[];
-  public context: typeof CommandHandler;
-  public parsedFlags: Record<string, any>;
+  public variables!: Record<string, string>;
+  public args!: string[];
+  public context!: typeof CommandHandler;
 
   public getVariable(key: string) {
     return Object.prototype.hasOwnProperty.call(this.variables, key) ? this.variables[key] : resolveVariable(key);

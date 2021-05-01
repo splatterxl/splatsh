@@ -89,7 +89,7 @@ The {green Node.js}-based shell for everyone!
 `);
     process.exit(0);
   } else {
-    const cmd = args.shift();
+    const cmd = args.shift() as typeof args[0];
     const res = await CommandHandler.invoke([cmd, ...args], {});
     if (res.code !== ExitCodes.SUCCESS) printfErr(res.out);
     else printf(res.out);

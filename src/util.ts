@@ -20,6 +20,7 @@ import { readdir } from "fs/promises";
 import path from "path";
 import { format } from "util";
 import { sessionVariables } from "./sessionVariables";
+import { type } from "os";
 
 export function prompt(hook: (prompt: string) => void, context = "") {
   hook(`${context || ""}$> `);
@@ -30,7 +31,7 @@ export async function findInPath(command: string): Promise<string | null> {
     const { PATH } = process.env;
     if (!PATH) reject("No path specified");
 
-    const paths = PATH.split(":");
+    const paths = PATH!.split(type() === "nt" ? ";" : ":");
 
     Promise.all(paths.map(prefix => readdir(prefix).then(files => ({ prefix, files }))))
       .then(prefixes => {
