@@ -16,11 +16,12 @@
  *  along with splatsh.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { readdir } from "fs/promises";
+import { constants as FS_CONSTANTS } from "fs";
+import { access, readdir } from "fs/promises";
+import { type } from "os";
 import path from "path";
 import { format } from "util";
 import { sessionVariables } from "./sessionVariables";
-import { type } from "os";
 
 export function prompt(hook: (prompt: string) => void, context = "") {
   hook(`${context || ""}$> `);
@@ -145,4 +146,14 @@ export function printf(str: string, ...args: unknown[]) {
  */
 export function printfErr(str: string, ...args: unknown[]) {
   process.stderr.write(format(str, ...args));
+}
+
+export function exists(filepath: string, mode?: number) {
+  return access(filepath, mode)
+    .then(() => true)
+    .catch(() => false);
+}
+
+export function isExecutable(filepath: string) {
+  return exists(filepath, FS_CONSTANTS.X_OK);
 }
