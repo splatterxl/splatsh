@@ -21,7 +21,7 @@ import { access, readdir } from "fs/promises";
 import { type } from "os";
 import path from "path";
 import { format } from "util";
-import { sessionVariables } from "./sessionVariables";
+import { sessionVariables } from "./sessionStore/variables";
 
 export function prompt(hook: (prompt: string) => void, context = "") {
   hook(`${context || ""}$> `);
@@ -125,7 +125,7 @@ export function parseArgs(str: string) {
 }
 
 export function resolveVariable(key: string) {
-  if (sessionVariables.has(key)) return sessionVariables.get(key);
+  if (Object.prototype.hasOwnProperty.call(sessionVariables, key)) return sessionVariables[key];
   if (Object.prototype.hasOwnProperty.call(process.env, key)) return process.env[key];
   return null;
 }
