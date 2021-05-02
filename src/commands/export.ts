@@ -23,18 +23,21 @@ export default class Export extends InbuiltCommand {
   public readonly usage = "export KEY=VALUE...";
 
   public async invoke() {
-    if (!this.args.length)
-      return {
-        out: `${Object.entries(process.env)
-          .map(([key, value]) => `${key}=${value}`)
-          .join("\n")}\n`,
-        code: ExitCodes.SUCCESS
-      };
+    if (!this.args.length) return this.printVars();
 
     const [key, value] = this.args[0].split("=");
     if (!key || !value) return { out: "", code: ExitCodes.ERROR };
 
     process.env[key] = value;
     return { out: "", code: ExitCodes.SUCCESS };
+  }
+
+  public printVars() {
+    return {
+      out: `${Object.entries(process.env)
+        .map(([key, value]) => `export ${key}='${value?.replace(`'`, `\\'`)}'`)
+        .join("\n")}\n`,
+      code: ExitCodes.SUCCESS
+    };
   }
 }

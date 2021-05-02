@@ -19,9 +19,9 @@
 import chalk from "chalk";
 import { ExitCodes } from "./constants";
 import { CommandHandler } from "./handleCommand";
-import { sessionVariables } from "./sessionVariables";
-import { parseArgs, printf, printfErr, prompt } from "./util";
 import resolveBeforeContinuing from "./handleProcessArgs";
+import { sessionVariables } from "./sessionStore/variables";
+import { parseArgs, printf, prompt } from "./util";
 
 let occupied = true;
 export function useOccupiedState(): [boolean, (val: boolean) => boolean] {
@@ -67,7 +67,7 @@ async function handleTypedData() {
 
   if (!args.length) {
     for (const [key, value] of Object.entries(commandVariables)) {
-      sessionVariables.set(key, value);
+      sessionVariables[key] = value;
     }
     return promptShell("~", ExitCodes.SUCCESS);
   }
