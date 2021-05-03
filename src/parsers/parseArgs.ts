@@ -1,5 +1,5 @@
 /*
- *  splatsh, a shell written in nodejs
+ *  Splatsh, a Node.js-based shell.
  *  Copyright (C) 2021 nearlySplat and Vendicated
  *
  *  splatsh is free software: you can redistribute it and/or modify
@@ -16,32 +16,7 @@
  *  along with splatsh.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { constants as FS_CONSTANTS } from "fs";
-import { access, readdir } from "fs/promises";
-import { type } from "os";
-import path from "path";
-import { format } from "util";
-import { sessionVariables } from "./sessionStore/variables";
-
-export function prompt(hook: (prompt: string) => void, context = "") {
-  hook(`${context || ""}$> `);
-}
-
-export async function findInPath(command: string): Promise<string | null> {
-  return new Promise((resolve, reject) => {
-    const { PATH } = process.env;
-    if (!PATH) reject("No path specified");
-
-    const paths = PATH!.split(type() === "nt" ? ";" : ":");
-
-    Promise.all(paths.map(prefix => readdir(prefix).then(files => ({ prefix, files }))))
-      .then(prefixes => {
-        const match = prefixes.find(p => p.files.includes(command));
-        resolve(match ? path.join(match.prefix, command) : null);
-      })
-      .catch(err => reject(`Invalid path ${err.path} in PATH variable`));
-  });
-}
+import { resolveVariable } from "../util/session";
 
 // TODO: handle $()
 export function parseArgs(str: string) {
@@ -122,38 +97,4 @@ export function parseArgs(str: string) {
   if (insideDoubleQuotes) throw 'Unmatched "';
   if (insideSingleQuotes) throw "Unmatched '";
   return args;
-}
-
-export function resolveVariable(key: string) {
-  if (Object.prototype.hasOwnProperty.call(sessionVariables, key)) return sessionVariables[key];
-  if (Object.prototype.hasOwnProperty.call(process.env, key)) return process.env[key];
-  return null;
-}
-
-/**
- * Prints formatted text to stdout, supports placeholders and automatically stringifies objects
- * @param str Format string
- * @param args Format args. If str has no format placeholders these get appended to str separated by newlines
- */
-export function printf(str: string, ...args: unknown[]) {
-  process.stdout.write(format(str, ...args));
-}
-
-/**
- * Prints formatted text to stderr, supports placeholders and automatically stringifies objects
- * @param str Format string
- * @param args Format args. If str has no format placeholders these get appended to str separated by newlines
- */
-export function printfErr(str: string, ...args: unknown[]) {
-  process.stderr.write(format(str, ...args));
-}
-
-export function exists(filepath: string, mode?: number) {
-  return access(filepath, mode)
-    .then(() => true)
-    .catch(() => false);
-}
-
-export function isExecutable(filepath: string) {
-  return exists(filepath, FS_CONSTANTS.X_OK);
 }

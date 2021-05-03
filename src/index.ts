@@ -17,13 +17,15 @@
  */
 
 import chalk from "chalk";
-import { ExitCodes } from "./constants";
 import { CommandHandler } from "./handleCommand";
 import resolveBeforeContinuing from "./handleProcessArgs";
+import { parseArgs } from "./parsers/parseArgs";
 import { sessionVariables } from "./sessionStore/variables";
-import { parseArgs, printf, prompt } from "./util";
+import { ExitCodes } from "./util/constants";
+import { printf, prompt } from "./util/session";
 
 let occupied = true;
+
 export function useOccupiedState(): [boolean, (val: boolean) => boolean] {
   function setOccupied(val: boolean) {
     return (occupied = val ?? !occupied);
@@ -31,13 +33,13 @@ export function useOccupiedState(): [boolean, (val: boolean) => boolean] {
   return [occupied, setOccupied];
 }
 
-void resolveBeforeContinuing.then(() => {
-  void CommandHandler.prepare().then(() => {
+void resolveBeforeContinuing
+  .then(() => CommandHandler.prepare())
+  .then(() => {
     printf(chalk`Welcome to {greenBright Splatsh}, the {green Node.js}-based terminal client for everyone!\n`);
     promptShell("~");
     occupied = false;
   });
-});
 
 let typing = "";
 
@@ -80,6 +82,7 @@ async function handleTypedData() {
   occupied = false;
   promptShell("~", result.code);
 }
+
 process.stdin.on("data", data => {
   if (data.toString() === "\n") return promptShell("~", 0);
   typing = data.toString().slice(0, -1) || "";

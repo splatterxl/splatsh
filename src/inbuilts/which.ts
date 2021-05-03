@@ -17,9 +17,9 @@
  */
 
 import { InbuiltCommand } from "../classes";
-import { ExitCodes } from "../constants";
 import { CommandHandler } from "../handleCommand";
-import { findInPath } from "../util";
+import { ExitCodes } from "../util/constants";
+import { findInPath } from "../util/fs";
 
 export default class Which extends InbuiltCommand {
   public readonly usage = "which CommandName";

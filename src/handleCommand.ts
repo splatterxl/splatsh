@@ -20,16 +20,16 @@ import { spawn } from "child_process";
 import { readdirSync } from "fs";
 import path from "path";
 import { Handler, InbuiltCommand } from "./classes";
-import { ExitCodes } from "./constants";
-import { CommandResult } from "./types";
-import { exists, findInPath, isExecutable } from "./util";
+import { ExitCodes } from "./util/constants";
+import { exists, findInPath, isExecutable } from "./util/fs";
+import { CommandResult } from "./util/types";
 
 export class CommandHandler implements Handler {
   public static inbuiltCommands: Record<string, new () => InbuiltCommand> = {};
 
   public static async prepare() {
-    for (let file of readdirSync(`${__dirname}/commands`)) {
-      const data = await import(`${__dirname}/commands/${file}`);
+    for (let file of readdirSync(`${__dirname}/inbuilts`)) {
+      const data = await import(`${__dirname}/inbuilts/${file}`);
       file = file.replace(/\.js$/, "");
       this.inbuiltCommands[file] = data.default;
     }
@@ -43,21 +43,22 @@ export class CommandHandler implements Handler {
     if (Object.prototype.hasOwnProperty.call(CommandHandler.inbuiltCommands, commandName))
       return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables).invoke();
 
-    const escapeIdx = commandName.indexOf("/");
-    if (escapeIdx !== -1) {
-      if (escapeIdx !== 0) commandName = path.join(process.cwd(), commandName);
-      if (!exists(commandName)) return { code: ExitCodes.COMMAND_NOT_FOUND, out: `No such file ${input}` };
+    const slashIdx = commandName.indexOf("/");
+    if (slashIdx !== -1) {
+      if (slashIdx !== 0) commandName = path.join(process.cwd(), commandName);
+      if (!(await exists(commandName))) return { code: ExitCodes.COMMAND_NOT_FOUND, out: `No such file: ${input}\n` };
     } else {
       try {
         commandName = (await findInPath(commandName)) as string;
         if (!commandName) return { out: `${input}: command not found\n`, code: ExitCodes.COMMAND_NOT_FOUND };
       } catch (err) {
-        if (typeof err !== "string") return { out: `An unknown error occurred`, code: ExitCodes.UNKNOWN_ERROR };
+        if (typeof err !== "string") return { out: `An unknown error occurred\n`, code: ExitCodes.UNKNOWN_ERROR };
         return { out: err, code: ExitCodes.ERROR };
       }
     }
 
-    if (!isExecutable(commandName)) return { out: `permission denied: ${commandName}`, code: ExitCodes.CANNOT_EXECUTE };
+    if (!(await isExecutable(commandName)))
+      return { out: `permission denied: ${commandName}\n`, code: ExitCodes.CANNOT_EXECUTE };
 
     return new Promise(r => {
       const child = spawn(
