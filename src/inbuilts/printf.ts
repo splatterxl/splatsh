@@ -1,5 +1,5 @@
 /*
- *  splatsh, a shell written in nodejs
+ *  Splatsh, a Node.js-based shell.
  *  Copyright (C) 2021 nearlySplat and Vendicated
  *
  *  splatsh is free software: you can redistribute it and/or modify

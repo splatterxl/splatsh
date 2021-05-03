@@ -1,7 +1,7 @@
 {
   "name": "splatsh",
   "version": "0.1.0",
-  "description": "splatsh, a shell written in nodejs",
+  "description": "Splatsh, a Node.js-based shell.",
   "license": "GPL-3.0",
   "author": "nearlySplat",
   "contributors": [
