@@ -53,6 +53,7 @@ async function handleTypedData() {
     args = parseArgs(typing);
   } catch (err) {
     printf(`${err}\n`);
+    occupied = false;
     return promptShell("~", ExitCodes.ERROR);
   }
 
@@ -69,6 +70,7 @@ async function handleTypedData() {
     for (const [key, value] of Object.entries(commandVariables)) {
       sessionVariables[key] = value;
     }
+    occupied = false;
     return promptShell("~", ExitCodes.SUCCESS);
   }
 
