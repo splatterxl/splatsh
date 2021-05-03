@@ -4,28 +4,44 @@
 The [Node.js](https://nodejs.org)-based command-line shell for everyone!
 
 ## Why. Just why. Another shell?
+
 Well, yes but actually no. This isn't meant to _replace_ any of your normal shells, like bash, zsh or fish. This is just a fun experiment. If you want to use it, then do, but beware of the risks.
 
 These 'risks' include:
-- no stdin pipe
-- no `-c` flags
+
+- Uncaught TypeError: Cannot read property 'splatsh' of undefined
+- Brendan Eich appearing at your Bed at 3 AM telling you to install Brave
 - being asked to contribute
 
-## __**This is _NOT_ finished.**_
+## __**This is _NOT_ finished.**__
+
 This is absolutely not fit for any normal day-to-day use. Check this spot in a few hundred years to see if it's ready yet.
 
 ## Cool, what do I need to install it?
+
+In the future, you will be able to install splatsh via npm or from the AUR, but as of now, the only option is to clone the source code and install it yourself
+
 ### Building from Source
-Well, first of all, you need [Node.js](https://nodejs.org), a [v8](https://v8.dev)-based JavaScript engine. Then, of course, you need [TypeScript](https://typescriptlang.org) to compile the project.
 
-When you have all those, just 
+Well, first of all, you'll need [Node.js](https://nodejs.org), a [v8](https://v8.dev)-based JavaScript engine
+
+Then, just run
+
 ```sh
-$ sudo make install
-```
-and splatsh should be installed into your `PATH`.
+# Install build dependencies
+$ npm i
 
-### Binaries
-You're out of luck. Check the Releases tab every year or so until you see `v1.0.0`. (Don't worry, we're working on it)
+# Install to /usr/local/bin
+$ sudo make install
+
+# OR Install to ~/.local/bin
+$ PREFIX=$HOME/.local make install
+```
+
+and splatsh will be installed and ready for use!
 
 ## Seems cool, how 2 contribute?
-Simply open a pull request with the feature you want to add. Be careful though, things in [Issue #3](https://github.com/nearlysplat/splatsh/issues/3) _are **not** to be touched._
+
+BE CRAZY!!!
+
+Then simply open a pull request with the feature you want to add
