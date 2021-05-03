@@ -1,6 +1,6 @@
 PREFIX ?= /usr/local
 
-.PHONY: install
+.PHONY: install uninstall transpile run clean
 all: run
 install: install-share install-bin
 
@@ -9,6 +9,13 @@ transpile:
 
 run: transpile
 	node .
+
+clean:
+	rm -rf build
+
+uninstall:
+	rm -rf $(PREFIX)/share/splatsh
+	rm $(PREFIX)/bin/splatsh
 
 install-share: transpile
 	mkdir -p $(PREFIX)/share/splatsh/node_modules
@@ -20,4 +27,3 @@ install-share: transpile
 install-bin: bin/splatsh
 	mkdir -p $(PREFIX)/$(dir $<)
 	install -m 0755 $< $(PREFIX)/$<
-	

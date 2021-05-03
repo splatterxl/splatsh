@@ -22,10 +22,11 @@
  */
 
 import chalk from "chalk";
-import { ExitCodes } from "./constants";
-import { CommandHandler } from "./handleCommand";
-import { printf, printfErr, parseArgs } from "./util";
 import { readFileSync } from "fs";
+import { CommandHandler } from "./handleCommand";
+import { parseArgs } from "./parsers/parseArgs";
+import { ExitCodes } from "./util/constants";
+import { printf, printfErr } from "./util/session";
 
 export const VALID_FLAGS = {
   h: "help",

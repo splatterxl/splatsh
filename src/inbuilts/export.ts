@@ -16,15 +16,28 @@
  *  along with splatsh.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { format } from "util";
 import { InbuiltCommand } from "../classes";
-import { ExitCodes } from "../constants";
+import { ExitCodes } from "../util/constants";
 
-export default class Printf extends InbuiltCommand {
-  public readonly usage = "printf <FORMAT> [ARGUMENTS...]";
+export default class Export extends InbuiltCommand {
+  public readonly usage = "export KEY=VALUE...";
 
-  public invoke() {
-    const formatSr = this.args.shift() ?? "";
-    return { out: format(formatSr, ...this.args), code: ExitCodes.SUCCESS };
+  public async invoke() {
+    if (!this.args.length) return this.printVars();
+
+    const [key, value] = this.args[0].split("=");
+    if (!key || !value) return { out: "", code: ExitCodes.ERROR };
+
+    process.env[key] = value;
+    return { out: "", code: ExitCodes.SUCCESS };
+  }
+
+  public printVars() {
+    return {
+      out: `${Object.entries(process.env)
+        .map(([key, value]) => `export ${key}='${value?.replace(`'`, `\\'`)}'`)
+        .join("\n")}\n`,
+      code: ExitCodes.SUCCESS
+    };
   }
 }

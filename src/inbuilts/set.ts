@@ -17,9 +17,9 @@
  */
 
 import { InbuiltCommand } from "../classes";
-import { ExitCodes } from "../constants";
 import { LongShellOptions, shellOptions } from "../sessionStore/shellOptions";
 import { sessionVariables } from "../sessionStore/variables";
+import { ExitCodes } from "../util/constants";
 
 const flags = Object.keys(shellOptions)
   .filter(k => k.length === 1)

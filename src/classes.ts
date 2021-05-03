@@ -17,8 +17,8 @@
  */
 
 import { CommandHandler } from "./handleCommand";
-import { CommandResult, PotentialPromise } from "./types";
-import { resolveVariable } from "./util";
+import { resolveVariable } from "./util/session";
+import { CommandResult, PotentialPromise } from "./util/types";
 
 export class Handler {
   public static invoke(..._args: any[]): PotentialPromise<void> {
