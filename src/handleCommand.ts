@@ -19,6 +19,7 @@
 import { spawn } from "child_process";
 import { readdirSync } from "fs";
 import path from "path";
+import { useCwd } from ".";
 import { Handler, InbuiltCommand } from "./classes";
 import { ExitCodes } from "./util/constants";
 import { exists, findInPath, isExecutable } from "./util/fs";
@@ -44,8 +45,9 @@ export class CommandHandler implements Handler {
       return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables).invoke();
 
     const slashIdx = commandName.indexOf("/");
+    const [cwd] = useCwd();
     if (slashIdx !== -1) {
-      if (slashIdx !== 0) commandName = path.join(process.cwd(), commandName);
+      if (slashIdx !== 0) commandName = path.join(cwd, commandName);
       if (!(await exists(commandName))) return { code: ExitCodes.COMMAND_NOT_FOUND, out: `No such file: ${input}\n` };
     } else {
       try {
@@ -58,14 +60,14 @@ export class CommandHandler implements Handler {
     }
 
     if (!(await isExecutable(commandName)))
-      return { out: `permission denied: ${commandName}\n`, code: ExitCodes.CANNOT_EXECUTE };
+      return { out: `The file ${commandName} is not executable.\n`, code: ExitCodes.CANNOT_EXECUTE };
 
     return new Promise(r => {
       const child = spawn(
         `${Object.entries(variables)
           .map(([key, value]) => `${key}="${value}"`)
           .join(" ")} ${commandName} ${args.map(arg => `"${arg}"`).join(" ")}`,
-        { shell: true }
+        { shell: true, cwd: cwd }
       );
 
       const { isRaw } = process.stdin;

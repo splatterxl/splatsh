@@ -22,12 +22,21 @@ import resolveBeforeContinuing from "./handleProcessArgs";
 import { parseArgs } from "./parsers/parseArgs";
 import { sessionVariables } from "./sessionStore/variables";
 import { ExitCodes } from "./util/constants";
-import { printf, prompt } from "./util/session";
+import { printf, prompt, shortenPath } from "./util/session";
 
 let occupied = true;
+let cwd = process.cwd();
+let oldCwd = cwd;
+export function useCwd() {
+  function setCwd(val: string) {
+    oldCwd = cwd;
+    return (cwd = val);
+  }
+  return [cwd, setCwd, oldCwd] as const;
+}
 
 export function useOccupiedState(): [boolean, (val: boolean) => boolean] {
-  function setOccupied(val: boolean) {
+  function setOccupied(val?: boolean) {
     return (occupied = val ?? !occupied);
   }
   return [occupied, setOccupied];
@@ -36,17 +45,19 @@ export function useOccupiedState(): [boolean, (val: boolean) => boolean] {
 void resolveBeforeContinuing
   .then(() => CommandHandler.prepare())
   .then(() => {
-    printf(chalk`Welcome to {greenBright Splatsh}, the {green Node.js}-based terminal client for everyone!\n`);
-    promptShell("~");
+    printf(chalk`Welcome to {yellowBright Splatsh}, the {green Node.js}-based terminal client for everyone!\n`);
+    promptShell(shortenPath(cwd));
     occupied = false;
   });
 
 let typing = "";
 
 function promptShell(loc?: string, code?: number | NodeJS.Signals) {
-  prompt(process.stdout.write.bind(process.stdout), `${loc ? "~" : loc}${code ? chalk` {red [${code}]}` : ""}` || "~ ");
+  prompt(
+    process.stdout.write.bind(process.stdout),
+    `${loc ? chalk`{greenBright ${loc}}` : "~"}${code ? chalk` {red [${code}]}` : ""}` || "~ "
+  );
 }
-
 async function handleTypedData() {
   if (occupied) return;
   else occupied = true;
@@ -56,7 +67,7 @@ async function handleTypedData() {
   } catch (err) {
     printf(`${err}\n`);
     occupied = false;
-    return promptShell("~", ExitCodes.ERROR);
+    return promptShell(shortenPath(cwd), ExitCodes.ERROR);
   }
 
   typing = "";
@@ -73,18 +84,18 @@ async function handleTypedData() {
       sessionVariables[key] = value;
     }
     occupied = false;
-    return promptShell("~", ExitCodes.SUCCESS);
+    return promptShell(shortenPath(cwd), ExitCodes.SUCCESS);
   }
 
   const result = await CommandHandler.invoke(args, commandVariables);
   printf(result.out);
   printf(result.err || "");
   occupied = false;
-  promptShell("~", result.code);
+  promptShell(shortenPath(cwd), result.code);
 }
 
 process.stdin.on("data", data => {
-  if (data.toString() === "\n") return promptShell("~", 0);
+  if (data.toString() === "\n") return promptShell(shortenPath(cwd), 0);
   typing = data.toString().slice(0, -1) || "";
   void handleTypedData();
 });

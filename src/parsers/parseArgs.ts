@@ -16,10 +16,12 @@
  *  along with splatsh.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { useCwd } from "..";
 import { resolveVariable } from "../util/session";
 
 // TODO: handle $()
 export function parseArgs(str: string) {
+  const [cwd] = useCwd();
   const args = [] as string[];
   let currentArg = "";
   let currentVariable = "";
@@ -42,8 +44,12 @@ export function parseArgs(str: string) {
     args.push(currentArg);
     currentArg = "";
   }
+  function substitute(char: string) {
+    if (!insideSingleQuotes && !insideDoubleQuotes) currentArg += char;
+  }
 
-  loop: for (const char of str) {
+  loop: for (let i = 0; i < str.length; i++) {
+    const char = str[i];
     if (escapingNext || (insideSingleQuotes && char !== `'`)) {
       currentArg += char;
       continue;
@@ -87,6 +93,12 @@ export function parseArgs(str: string) {
       case "\n":
         pushArg();
         break loop;
+      case "~":
+        substitute(process.env.HOME as string);
+        break;
+      case ".":
+        substitute(cwd);
+        break;
       default:
         pushChar(char);
     }
