@@ -27,7 +27,7 @@ const flags = Object.keys(shellOptions)
 
 const nameRegex = new RegExp(`-o (${Object.keys(LongShellOptions).join("|")})`, "g");
 
-export default class Printf extends InbuiltCommand {
+export default class Set extends InbuiltCommand {
   public readonly usage = `set [-${flags}] [-o OPTION_NAME]`;
 
   public invoke() {
