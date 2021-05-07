@@ -169,7 +169,7 @@ export type ParsedFlags<Flags extends Record<string, FlagSchema>> = {
 
 type ParsedParameter<Param extends FlagParam> = Param["choices"] extends ReadonlyArray<infer T>
   ? PossiblyOptionalParam<Param, T>
-  : Param["transform"] extends (param: string) => string
+  : Param["transform"] extends (param: string) => unknown
   ? PossiblyOptionalParam<Param, ReturnType<Param["transform"]>>
   : PossiblyOptionalParam<Param>;
 
