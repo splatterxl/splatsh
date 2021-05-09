@@ -20,6 +20,7 @@ import { useCwd } from "..";
 import { InbuiltCommand } from "../classes";
 import { ExitCodes } from "../util/constants";
 import { statSync } from "fs";
+import { join } from "path";
 
 export default class Cd extends InbuiltCommand {
   public readonly usage = "cd FOLDER";
@@ -29,7 +30,7 @@ export default class Cd extends InbuiltCommand {
     if (path === "-") {
       path = oldCwd;
     } else if (!path.startsWith("/")) {
-      path = `${cwd  }/${  path}`;
+      path = join(cwd, path);
     }
     let isDir;
     try {

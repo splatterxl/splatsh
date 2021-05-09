@@ -18,6 +18,7 @@
 
 import { useCwd } from "..";
 import { resolveVariable } from "../util/session";
+import { join } from "path";
 
 // TODO: handle $()
 export function parseArgs(str: string) {
@@ -97,7 +98,11 @@ export function parseArgs(str: string) {
         substitute(process.env.HOME as string);
         break;
       case ".":
-        substitute(cwd);
+        if (str[i + 1] === "/") substitute(cwd);
+        else if (str[i + 1] === "." && str[i + 2] === "/") {
+          i++;
+          substitute(join(cwd, ".."));
+        } else pushChar(char);
         break;
       default:
         pushChar(char);

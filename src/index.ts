@@ -42,8 +42,8 @@ export function useOccupiedState(): [boolean, (val: boolean) => boolean] {
   return [occupied, setOccupied];
 }
 
-void resolveBeforeContinuing
-  .then(() => CommandHandler.prepare())
+void CommandHandler.prepare()
+  .then(() => resolveBeforeContinuing)
   .then(() => {
     printf(chalk`Welcome to {yellowBright Splatsh}, the {green Node.js}-based terminal client for everyone!\n`);
     promptShell(shortenPath(cwd));
