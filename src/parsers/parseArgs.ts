@@ -17,7 +17,7 @@
  */
 
 import { useCwd } from "..";
-import { resolveVariable } from "../util/session";
+import { printf, printfln, resolveVariable } from "../util/session";
 import { join } from "path";
 
 // TODO: handle $()
@@ -47,6 +47,7 @@ export function parseArgs(str: string) {
   }
   function substitute(char: string) {
     if (!insideSingleQuotes && !insideDoubleQuotes) currentArg += char;
+    else pushChar(char);
   }
 
   loop: for (let i = 0; i < str.length; i++) {
@@ -95,7 +96,8 @@ export function parseArgs(str: string) {
         pushArg();
         break loop;
       case "~":
-        substitute(process.env.HOME as string);
+        if (currentArg === "") substitute(process.env.HOME as string);
+        else pushChar(char);
         break;
       case ".":
         if (str[i + 1] === "/") substitute(cwd);

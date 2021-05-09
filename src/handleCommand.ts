@@ -17,7 +17,7 @@
  */
 
 import { spawn } from "child_process";
-import { readdirSync } from "fs";
+import { readdirSync, statSync } from "fs";
 import path from "path";
 import { useCwd } from ".";
 import { Handler, InbuiltCommand } from "./classes";
@@ -59,16 +59,18 @@ export class CommandHandler implements Handler {
       }
     }
 
-    if (!(await isExecutable(commandName)))
-      return { out: `The file ${commandName} is not executable.\n`, code: ExitCodes.CANNOT_EXECUTE };
+    const data = statSync(commandName);
 
+    if (!(await isExecutable(commandName)) || (data.isDirectory() && args.length))
+      return { out: `The file ${commandName} is not executable.\n`, code: ExitCodes.CANNOT_EXECUTE };
+    if (data.isDirectory()) {
+      args.unshift(commandName);
+      commandName = "cd";
+      return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables).invoke();
+    }
     return new Promise(r => {
-      const child = spawn(
-        `${Object.entries(variables)
-          .map(([key, value]) => `${key}="${value}"`)
-          .join(" ")} ${commandName} ${args.map(arg => `"${arg}"`).join(" ")}`,
-        { shell: true, cwd: cwd }
-      );
+      // TODO: remove shell: true once redirections and other stuff like that are finished
+      const child = spawn(commandName, args, { env: { ...variables, ...process.env }, cwd, shell: true });
 
       const { isRaw } = process.stdin;
       process.stdin.setRawMode(false);
@@ -84,6 +86,7 @@ export class CommandHandler implements Handler {
         process.stdin.setRawMode(isRaw);
         r({ out: "", code: code || signal || 0 });
       });
+      void r;
     });
   }
 }
