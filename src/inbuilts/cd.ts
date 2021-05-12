@@ -39,7 +39,11 @@ export default class Cd extends InbuiltCommand {
       return { err: `cd: ${path}: no such file or directory\n`, code: ExitCodes.ERROR, out: "" };
     }
     if (!isDir) return { code: ExitCodes.ERROR, err: `cd: ${path}: is not a directory\n`, out: "" };
-    setCwd(path);
+    try {
+      setCwd(path);
+    } catch {
+      return { out: `cd: ${path}: Permission denied\n`, code: ExitCodes.ERROR };
+    }
     return { out: "", code: ExitCodes.SUCCESS };
   }
 }
