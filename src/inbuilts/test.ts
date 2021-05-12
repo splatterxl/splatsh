@@ -16,7 +16,8 @@
  *  along with splatsh.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FlagSchemaObject, InbuiltCommand } from "../classes";
+import { InbuiltCommand } from "../classes";
+import { FlagSchemaObject, ParseFlagsOutput } from "../util/types";
 
 // FIXME temporary test command for the flag parser
 export default class Which extends InbuiltCommand<FlagSchemaObject> {
@@ -44,6 +45,7 @@ export default class Which extends InbuiltCommand<FlagSchemaObject> {
       aliases: ["a"]
     }
   } as const;
+  public declare flags: ParseFlagsOutput<Which["flagSchema"]>;
 
   public async invoke() {
     const [parsed, invalid, unrecognised, rest] = this.flags;

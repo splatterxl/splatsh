@@ -16,6 +16,7 @@
  *  along with splatsh.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { FlagSchema, ParsedFlags } from "../parsers/parseFlags";
 import { ExitCodes } from "./constants";
 
 export type PotentialPromise<T> = Promise<T> | T;
@@ -25,3 +26,11 @@ export interface CommandResult {
   code: NodeJS.Signals | ExitCodes;
   err?: string;
 }
+
+export type ParseFlagsOutput<T extends FlagSchemaObject> = [
+  ParsedFlags<T>,
+  Record<string, string | null>,
+  string[],
+  string
+];
+export type FlagSchemaObject = Record<string, FlagSchema>;

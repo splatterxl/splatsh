@@ -17,17 +17,15 @@
  */
 
 import { CommandHandler } from "./handleCommand";
-import { FlagSchema, parseFlags, ParsedFlags } from "./parsers/parseFlags";
+import { FlagSchema, parseFlags } from "./parsers/parseFlags";
 import { resolveVariable } from "./util/session";
-import { CommandResult, PotentialPromise } from "./util/types";
+import { CommandResult, FlagSchemaObject, ParseFlagsOutput, PotentialPromise } from "./util/types";
 
 export class Handler {
   public static invoke(..._args: any[]): PotentialPromise<void> {
     throw new Error("Not implemented");
   }
 }
-
-export type FlagSchemaObject = Record<string, FlagSchema>;
 
 /* TODO: what should these types be? */
 export abstract class InbuiltCommand<T extends Record<string, FlagSchema> | undefined = undefined> {
@@ -36,9 +34,7 @@ export abstract class InbuiltCommand<T extends Record<string, FlagSchema> | unde
   public args!: string[];
   public flagSchema!: T;
   public context!: typeof CommandHandler;
-  public flags!: T extends FlagSchemaObject
-    ? [ParsedFlags<FlagSchemaObject>, Record<string, string | null>, string[], string]
-    : undefined;
+  public flags!: T extends FlagSchemaObject ? ParseFlagsOutput<T> : undefined;
   public raw!: string;
 
   public getVariable(key: string) {
