@@ -20,19 +20,19 @@ import chalk from "chalk";
 import { CommandHandler } from "./handleCommand";
 import resolveBeforeContinuing from "./handleProcessArgs";
 import { parseArgs } from "./parsers/parseArgs";
+import { sessionState } from "./sessionStore/state";
 import { sessionVariables } from "./sessionStore/variables";
 import { ExitCodes } from "./util/constants";
 import { printf, prompt, shortenPath } from "./util/session";
 
 let occupied = true;
-let cwd = process.cwd();
-let oldCwd = cwd;
 export function useCwd() {
   function setCwd(val: string) {
-    oldCwd = cwd;
-    return (cwd = val);
+    sessionState.lastCwd = process.cwd();
+    process.chdir(val);
+    return process.cwd();
   }
-  return [cwd, setCwd, oldCwd] as const;
+  return [process.cwd(), setCwd, sessionState.lastCwd] as const;
 }
 
 export function useOccupiedState(): [boolean, (val: boolean) => boolean] {
@@ -46,7 +46,7 @@ void CommandHandler.prepare()
   .then(() => resolveBeforeContinuing)
   .then(() => {
     printf(chalk`Welcome to {yellowBright Splatsh}, the {green Node.js}-based terminal client for everyone!\n`);
-    promptShell(shortenPath(cwd));
+    promptShell(shortenPath(process.cwd()));
     occupied = false;
   });
 
@@ -67,7 +67,7 @@ async function handleTypedData() {
   } catch (err) {
     printf(`${err}\n`);
     occupied = false;
-    return promptShell(shortenPath(cwd), ExitCodes.ERROR);
+    return promptShell(shortenPath(process.cwd()), ExitCodes.ERROR);
   }
 
   typing = "";
@@ -84,19 +84,19 @@ async function handleTypedData() {
       sessionVariables[key] = value;
     }
     occupied = false;
-    return promptShell(shortenPath(cwd), ExitCodes.SUCCESS);
+    return promptShell(shortenPath(process.cwd()), ExitCodes.SUCCESS);
   }
 
   const result = await CommandHandler.invoke(args, commandVariables);
   printf(result.out);
   printf(result.err || "");
   occupied = false;
-  promptShell(shortenPath(cwd), result.code);
+  promptShell(shortenPath(process.cwd()), result.code);
 }
 
 process.stdin.on("data", data => {
-  if (data.toString() === "\n") return promptShell(shortenPath(cwd), 0);
-  typing = data.toString().slice(0, -1) || "";
+  if (data.toString() === "\n") return promptShell(shortenPath(process.cwd()), 0);
+  typing = data.toString().trim() || "";
   void handleTypedData();
 });
 
