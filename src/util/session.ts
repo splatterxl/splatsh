@@ -23,6 +23,10 @@ export function prompt(hook: (prompt: string) => void, context = "") {
   hook(`${context || ""}$> `);
 }
 
+export function shortenPath(path: string) {
+  return path.replace(new RegExp(process.env.HOME as string), "~").replace(/(\/)(.).*?(\/)/g, "$1$2$3");
+}
+
 export function resolveVariable(key: string) {
   if (Object.prototype.hasOwnProperty.call(sessionVariables, key)) return sessionVariables[key];
   if (Object.prototype.hasOwnProperty.call(process.env, key)) return process.env[key];
@@ -32,9 +36,9 @@ export function resolveVariable(key: string) {
 /**
  * Prints formatted text to stdout, supports placeholders and automatically stringifies objects
  * @param str Format string
- * @param args Format args. If str has no format placeholders these get appended to str separated by newlines
+ * @param [args] Format args. If str has no format placeholders these get appended to str separated by newlines
  */
-export function printf(str: string, ...args: unknown[]) {
+export function printf<T>(str: string, ...args: T[]) {
   process.stdout.write(format(str, ...args));
 }
 
@@ -43,6 +47,10 @@ export function printf(str: string, ...args: unknown[]) {
  * @param str Format string
  * @param args Format args. If str has no format placeholders these get appended to str separated by newlines
  */
-export function printfErr(str: string, ...args: unknown[]) {
+export function printfErr<T>(str: string, ...args: T[]) {
   process.stderr.write(format(str, ...args));
+}
+
+export function printfln<T>(str: string, ...args: T[]) {
+  return printf(`${str}\n`, ...args);
 }

@@ -32,7 +32,10 @@ export const VALID_FLAGS = {
   h: "help",
   help: Boolean,
   c: Boolean,
-  exec: String
+  exec: String,
+  debug: Boolean,
+  d: "debug",
+  D: Boolean
 };
 
 type keyofValidFlags = keyof typeof VALID_FLAGS;
@@ -77,7 +80,7 @@ export async function handleArgs(args: typeof process.argv) {
       process.exit();
     });
   } else if (flags.h || flags.help) {
-    printf(chalk`{greenBright {bold Splatsh}}
+    printf(chalk`{yellowBright {bold Splatsh}}
 The {green Node.js}-based shell for everyone!
 
 ---------
@@ -87,8 +90,12 @@ The {green Node.js}-based shell for everyone!
 {bold FLAGS}:
   -h, --help\t\tShows this screen
   -c\t\t\tExecutes arbitary Splatsh code
+  -d, --debug\t\tShows debug output
+  -D\t\t\tShows extended debug output
 `);
     process.exit(0);
+  } else if (flags.d || flags.debug || flags.D) {
+    printf("Current direcrory: %s\n", process.cwd());
   } else {
     const cmd = args.shift() as typeof args[0];
     const res = await CommandHandler.invoke([cmd, ...args], {});

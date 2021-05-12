@@ -17,8 +17,9 @@
  */
 
 import { spawn } from "child_process";
-import { readdirSync } from "fs";
+import { readdirSync, statSync } from "fs";
 import path from "path";
+import { useCwd } from ".";
 import { Handler, InbuiltCommand } from "./classes";
 import { ExitCodes } from "./util/constants";
 import { exists, findInPath, isExecutable } from "./util/fs";
@@ -44,8 +45,9 @@ export class CommandHandler implements Handler {
       return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables).invoke();
 
     const slashIdx = commandName.indexOf("/");
+    const [cwd] = useCwd();
     if (slashIdx !== -1) {
-      if (slashIdx !== 0) commandName = path.join(process.cwd(), commandName);
+      if (slashIdx !== 0) commandName = path.join(cwd, commandName);
       if (!(await exists(commandName))) return { code: ExitCodes.COMMAND_NOT_FOUND, out: `No such file: ${input}\n` };
     } else {
       try {
@@ -57,16 +59,18 @@ export class CommandHandler implements Handler {
       }
     }
 
-    if (!(await isExecutable(commandName)))
-      return { out: `permission denied: ${commandName}\n`, code: ExitCodes.CANNOT_EXECUTE };
+    const data = statSync(commandName);
 
+    if (!(await isExecutable(commandName)) || (data.isDirectory() && args.length))
+      return { out: `The file ${commandName} is not executable.\n`, code: ExitCodes.CANNOT_EXECUTE };
+    if (data.isDirectory()) {
+      args.unshift(commandName);
+      commandName = "cd";
+      return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables).invoke();
+    }
     return new Promise(r => {
-      const child = spawn(
-        `${Object.entries(variables)
-          .map(([key, value]) => `${key}="${value}"`)
-          .join(" ")} ${commandName} ${args.map(arg => `"${arg}"`).join(" ")}`,
-        { shell: true }
-      );
+      // TODO: remove shell: true once redirections and other stuff like that are finished
+      const child = spawn(commandName, args, { env: { ...variables, ...process.env }, cwd, shell: true });
 
       const { isRaw } = process.stdin;
       process.stdin.setRawMode(false);
@@ -82,6 +86,7 @@ export class CommandHandler implements Handler {
         process.stdin.setRawMode(isRaw);
         r({ out: "", code: code || signal || 0 });
       });
+      void r;
     });
   }
 }
