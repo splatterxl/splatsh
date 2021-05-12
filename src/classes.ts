@@ -17,6 +17,7 @@
  */
 
 import { CommandHandler } from "./handleCommand";
+import { FlagSchema, parseFlags, ParsedFlags } from "./parsers/parseFlags";
 import { resolveVariable } from "./util/session";
 import { CommandResult, PotentialPromise } from "./util/types";
 
@@ -26,21 +27,30 @@ export class Handler {
   }
 }
 
+export type FlagSchemaObject = Record<string, FlagSchema>;
+
 /* TODO: what should these types be? */
-export abstract class InbuiltCommand {
+export abstract class InbuiltCommand<T extends Record<string, FlagSchema> | undefined = undefined> {
   public abstract readonly usage: string;
   public variables!: Record<string, string>;
   public args!: string[];
+  public flagSchema!: T;
   public context!: typeof CommandHandler;
+  public flags!: T extends FlagSchemaObject
+    ? [ParsedFlags<FlagSchemaObject>, Record<string, string | null>, string[], string]
+    : undefined;
+  public raw!: string;
 
   public getVariable(key: string) {
     return Object.prototype.hasOwnProperty.call(this.variables, key) ? this.variables[key] : resolveVariable(key);
   }
 
-  public prepare(handler = CommandHandler, args: string[], variables: Record<string, string>) {
+  public prepare(handler = CommandHandler, args: string[], variables: Record<string, string>, raw: string) {
     this.args = args;
     this.context = handler;
     this.variables = variables;
+    this.raw = raw;
+    if (this.flagSchema) this.flags = parseFlags<FlagSchemaObject>(raw, this.flagSchema as FlagSchemaObject) as any;
     return this;
   }
 

@@ -16,12 +16,12 @@
  *  along with splatsh.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useCwd } from "..";
-import { printf, printfln, resolveVariable } from "../util/session";
 import { join } from "path";
+import { useCwd } from "..";
+import { resolveVariable } from "../util/session";
 
 // TODO: handle $()
-export function parseArgs(str: string) {
+export function parseArgs(str: string): [string[], string] {
   const [cwd] = useCwd();
   const args = [] as string[];
   let currentArg = "";
@@ -115,5 +115,5 @@ export function parseArgs(str: string) {
   if (resolvingVariable) args.push("$");
   if (insideDoubleQuotes) throw 'Unmatched "';
   if (insideSingleQuotes) throw "Unmatched '";
-  return args;
+  return [args, str];
 }

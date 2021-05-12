@@ -72,7 +72,8 @@ export async function handleArgs(args: typeof process.argv) {
   if (!str) return;
   const flags = parseProcessFlags(str);
   if (flags.c) {
-    await CommandHandler.invoke(parseArgs(str.slice(str.indexOf("-c") + 2)), {}).then(v => {
+    const code = parseArgs(str.slice(str.indexOf("-c") + 2));
+    await CommandHandler.invoke(code, {}).then(v => {
       if (v.code !== ExitCodes.SUCCESS) {
         printfErr(v.out);
         process.exit(v.code as ExitCodes);
@@ -98,7 +99,7 @@ The {green Node.js}-based shell for everyone!
     printf("Current direcrory: %s\n", process.cwd());
   } else {
     const cmd = args.shift() as typeof args[0];
-    const res = await CommandHandler.invoke([cmd, ...args], {});
+    const res = await CommandHandler.invoke(parseArgs('"' + [cmd, ...args].join('" "') + '"'), {});
     if (res.code !== ExitCodes.SUCCESS) printfErr(res.out);
     else printf(res.out);
     process.exit(res.code as ExitCodes);

@@ -36,13 +36,16 @@ export class CommandHandler implements Handler {
     }
   }
 
-  public static async invoke(args: string[], variables: Record<string, string>): Promise<CommandResult> {
+  public static async invoke(
+    [args, raw]: [string[], string],
+    variables: Record<string, string>
+  ): Promise<CommandResult> {
     const input = args.shift();
     if (!input) return { code: ExitCodes.SUCCESS, out: "" };
     let commandName = input;
 
     if (Object.prototype.hasOwnProperty.call(CommandHandler.inbuiltCommands, commandName))
-      return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables).invoke();
+      return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables, raw).invoke();
 
     const slashIdx = commandName.indexOf("/");
     const [cwd] = useCwd();
@@ -66,7 +69,7 @@ export class CommandHandler implements Handler {
     if (data.isDirectory()) {
       args.unshift(commandName);
       commandName = "cd";
-      return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables).invoke();
+      return new CommandHandler.inbuiltCommands[commandName]().prepare(this, args, variables, raw).invoke();
     }
     return new Promise(r => {
       // TODO: remove shell: true once redirections and other stuff like that are finished

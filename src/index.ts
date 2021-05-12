@@ -74,12 +74,12 @@ async function handleTypedData() {
 
   const commandVariables = {} as Record<string, string>;
 
-  while (args.length && /\w+=[^\s]+/.test(args[0])) {
-    const [key, value] = args.shift()!.split("=");
+  while (args[0].length && /\w+=[^\s]+/.test(args[0][0])) {
+    const [key, value] = args[0].shift()!.split("=");
     commandVariables[key] = value;
   }
 
-  if (!args.length) {
+  if (!args[0].length) {
     for (const [key, value] of Object.entries(commandVariables)) {
       sessionVariables[key] = value;
     }
