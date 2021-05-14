@@ -19,29 +19,18 @@ This is absolutely not fit for any normal day-to-day use. Check this spot in a f
 
 ## Cool, what do I need to install it?
 
-In the future, you will be able to install splatsh via npm or from the AUR, but as of now, the only option is to clone the source code and install it yourself
+In the future, you will be able to install splatsh via npm or from the AUR, but as of now, the current workaround is to install the source for splatsh and build directly with [`make`](https://en.m.wikipedia.org/wiki/Make_(software)).
 
-### Building from Source
-
-Well, first of all, you'll need [Node.js](https://nodejs.org), a [v8](https://v8.dev)-based JavaScript engine
-
-Then, just run
-
+There is, however an easy shell command you can use. It is as follows:
 ```sh
-# Install build dependencies
-$ npm i
-
-# Install to /usr/local/bin
-$ sudo make install
-
-# OR Install to ~/.local/bin
-$ PREFIX=$HOME/.local make install
+$ curl -o- https://raw.githubusercontent.com/nearlySplat/splatsh/development/scripts/install.sh | bash
+# or if you want to download the script
+$ wget https://raw.githubusercontent.com/nearlysplat/splatsh/development/scripts/install.sh
 ```
 
-and splatsh will be installed and ready for use!
+No, Windows users. We will never support Windows. Just use PowerShell.
+
+You'll need [Node.js](https://nodejs.org), a [v8](https://v8.dev)-based JavaScript engine
 
 ## Seems cool, how 2 contribute?
-
-BE CRAZY!!!
-
-Then simply open a pull request with the feature you want to add
+I applaud you for having the courage to even want to touch the code we wrote. Simply open a pull request with the feature you want to add, and we'll do our best to review it and *hopefully* even merge it!
