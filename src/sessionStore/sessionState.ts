@@ -17,6 +17,6 @@
  */
 
 export const sessionState = {
-  lastExitCode: 0,
-  lastCwd: process.cwd()
+  lastCwd: process.cwd(),
+  lastExitCode: 0
 };

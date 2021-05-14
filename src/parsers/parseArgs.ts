@@ -16,13 +16,10 @@
  *  along with splatsh.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { join } from "path";
-import { useCwd } from "..";
 import { resolveVariable } from "../util/session";
 
 // TODO: handle $()
 export function parseArgs(str: string): [string[], string] {
-  const [cwd] = useCwd();
   const args = [] as string[];
   let currentArg = "";
   let currentVariable = "";
@@ -95,17 +92,6 @@ export function parseArgs(str: string): [string[], string] {
       case "\n":
         pushArg();
         break loop;
-      case "~":
-        if (currentArg === "") substitute(process.env.HOME as string);
-        else pushChar(char);
-        break;
-      case ".":
-        if (str[i + 1] === "/") substitute(cwd);
-        else if (str[i + 1] === "." && str[i + 2] === "/") {
-          i++;
-          substitute(join(cwd, ".."));
-        } else pushChar(char);
-        break;
       default:
         pushChar(char);
     }

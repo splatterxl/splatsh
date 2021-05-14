@@ -16,34 +16,27 @@
  *  along with splatsh.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useCwd } from "..";
+import { stat } from "fs/promises";
 import { InbuiltCommand } from "../classes";
+import { sessionState } from "../sessionStore/sessionState";
 import { ExitCodes } from "../util/constants";
-import { statSync } from "fs";
-import { join } from "path";
 
 export default class Cd extends InbuiltCommand {
-  public readonly usage = "cd FOLDER";
-  public invoke() {
-    let path = this.args.length ? this.args[0] : (process.env.HOME as string);
-    const [cwd, setCwd, oldCwd] = useCwd();
-    if (path === "-") {
-      path = oldCwd;
-    } else if (!path.startsWith("/")) {
-      path = join(cwd, path);
-    }
-    let isDir;
+  public readonly usage = "cd [DIR]";
+
+  public async invoke() {
+    const input = this.args[0] || process.env.HOME!;
+    const newCwd = input === "-" ? sessionState.lastCwd : input;
+
+    const stats = await stat(newCwd).catch(() => void 0);
+    if (!stats) return { err: `No such file or directory: ${input}\n`, code: ExitCodes.BUILTIN_MISUSE };
+    if (!stats.isDirectory()) return { err: `Not a directory: ${input}\n`, code: ExitCodes.BUILTIN_MISUSE };
     try {
-      isDir = statSync(path).isDirectory();
+      sessionState.lastCwd = process.cwd();
+      process.chdir(newCwd);
+      return { code: ExitCodes.SUCCESS };
     } catch {
-      return { err: `cd: ${path}: no such file or directory\n`, code: ExitCodes.ERROR, out: "" };
+      return { out: `Permission denied: ${newCwd}\n`, code: ExitCodes.ERROR };
     }
-    if (!isDir) return { code: ExitCodes.ERROR, err: `cd: ${path}: is not a directory\n`, out: "" };
-    try {
-      setCwd(path);
-    } catch {
-      return { out: `cd: ${path}: Permission denied\n`, code: ExitCodes.ERROR };
-    }
-    return { out: "", code: ExitCodes.SUCCESS };
   }
 }

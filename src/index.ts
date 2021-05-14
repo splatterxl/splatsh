@@ -20,20 +20,11 @@ import chalk from "chalk";
 import { CommandHandler } from "./handleCommand";
 import resolveBeforeContinuing from "./handleProcessArgs";
 import { parseArgs } from "./parsers/parseArgs";
-import { sessionState } from "./sessionStore/state";
 import { sessionVariables } from "./sessionStore/variables";
 import { ExitCodes } from "./util/constants";
 import { printf, prompt, shortenPath } from "./util/session";
 
 let occupied = true;
-export function useCwd() {
-  function setCwd(val: string) {
-    sessionState.lastCwd = process.cwd();
-    process.chdir(val);
-    return process.cwd();
-  }
-  return [process.cwd(), setCwd, sessionState.lastCwd] as const;
-}
 
 export function useOccupiedState(): [boolean, (val: boolean) => boolean] {
   function setOccupied(val?: boolean) {
@@ -88,7 +79,7 @@ async function handleTypedData() {
   }
 
   const result = await CommandHandler.invoke(args, commandVariables);
-  printf(result.out);
+  if (result.out !== void 0) printf(result.out);
   printf(result.err || "");
   occupied = false;
   promptShell(shortenPath(process.cwd()), result.code);
