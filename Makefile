@@ -26,6 +26,3 @@ install-share: transpile
 install-bin: bin/splatsh
 	mkdir -p $(PREFIX)/$(dir $<)
 	install -m 0755 $< $(PREFIX)/$<
-
-install-deps:
-	npm i --only=production
