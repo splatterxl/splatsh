@@ -22,7 +22,13 @@ version="0.1.0"
 
 SUDO=''
 if [ "$(id -u)" -ne 0 ]; then
-    SUDO='sudo'
+    if command -v sudo >/dev/null; then
+      SUDO="sudo"
+    elif command -v doas >/dev/null; then
+      SUDO="doas"
+    else
+      _die "Neither sudo nor doas were found. Please run this script as root or install one of them"
+    fi
 fi
 
 _die() {
