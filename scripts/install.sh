@@ -52,12 +52,12 @@ _install() {
   tsc -p tsconfig.json
 
   $SUDO mkdir -p "$PREFIX/share/splatsh/node_modules"
-	node -e 'console.log(JSON.stringify({ dependencies: require("./package.json").dependencies }))' | $SUDO tee "$PREFIX/share/splatsh/package.json"
-	$SUDO npm i --only=production --prefix "$PREFIX/share/splatsh"
-	$SUDO cp -r "build/"* "$PREFIX/share/splatsh"
+  node -e 'console.log(JSON.stringify({ dependencies: require("./package.json").dependencies }))' | $SUDO tee "$PREFIX/share/splatsh/package.json"
+  $SUDO npm i --only=production --prefix "$PREFIX/share/splatsh"
+  $SUDO cp -r "build/"* "$PREFIX/share/splatsh"
 
   $SUDO mkdir -p "$PREFIX/bin"
-	$SUDO install -m 0755 bin/splatsh "$PREFIX/bin/splatsh"
+  $SUDO install -m 0755 bin/splatsh "$PREFIX/bin/splatsh"
 }
 
 _uninstall() {
@@ -65,7 +65,7 @@ _uninstall() {
 
   set -x
   $SUDO rm -rf "$PREFIX/share/splatsh"
-	$SUDO rm -f "$PREFIX/bin/splatsh"
+  $SUDO rm -f "$PREFIX/bin/splatsh"
 }
 
 _print_help() {
