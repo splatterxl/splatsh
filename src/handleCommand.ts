@@ -63,7 +63,7 @@ export class CommandHandler implements Handler {
     const data = statSync(commandName);
 
     if (!(await isExecutable(commandName)) || (data.isDirectory() && args.length))
-      return { out: `The file ${commandName} is not executable.\n`, code: ExitCodes.CANNOT_EXECUTE };
+      return { out: `${commandName}: permission denied\n`, code: ExitCodes.CANNOT_EXECUTE };
     if (data.isDirectory()) {
       args.unshift(commandName);
       commandName = "cd";
@@ -75,7 +75,6 @@ export class CommandHandler implements Handler {
 
       const { isRaw } = process.stdin;
       process.stdin.setRawMode(false);
-
       function writeToChild(d: Buffer) {
         child.stdin.write(d);
       }
