@@ -92,7 +92,9 @@ process.stdin.on("data", data => {
 });
 
 process.on("SIGINT", () => {
-  comment: {
-    break comment;
-  }
+  //
+});
+
+process.on("SIGTTIN", () => {
+  //
 });

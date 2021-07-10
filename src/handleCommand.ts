@@ -71,20 +71,12 @@ export class CommandHandler implements Handler {
     }
     return new Promise(r => {
       // TODO: remove shell: true once redirections and other stuff like that are finished
-      const child = spawn(commandName, args, { shell: true });
-
-      const { isRaw } = process.stdin;
-      process.stdin.setRawMode(false);
-      function writeToChild(d: Buffer) {
-        child.stdin.write(d);
-      }
-      process.stdin.on("data", writeToChild);
-      child.stdout.on("data", d => process.stdout.write(d.toString()));
-      child.stderr.on("data", d => process.stderr.write(d.toString()));
+      const child = spawn(commandName, args, { shell: true, stdio: "inherit" });
       child.on("exit", (code, signal) => {
-        process.stdin.off("data", writeToChild);
-        process.stdin.setRawMode(isRaw);
         r({ out: "", code: code || signal || 0 });
+      });
+      child.stderr?.on("data", d => {
+        if (["logout\n", "exit\n"].includes(data.toString())) child.kill("SIGTERM");
       });
       void r;
     });
