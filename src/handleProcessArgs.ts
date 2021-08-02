@@ -72,12 +72,10 @@ export async function handleArgs(args: typeof process.argv) {
   if (!str) return;
   const flags = parseProcessFlags(str);
   if (flags.c) {
-    await CommandHandler.invoke(parseArgs(str.slice(str.indexOf("-c") + 2)), {}).then(v => {
-      if (v.code !== ExitCodes.SUCCESS) {
-        printfErr(v.out);
-        process.exit(v.code as ExitCodes);
-      } else printf(v.out);
-      process.exit();
+    const code = parseArgs(str.slice(str.indexOf("-c") + 2));
+    await CommandHandler.invoke(code, {}).then(v => {
+      if (v.out !== void 0) (v.code === ExitCodes.SUCCESS ? printf : printfErr)(v.out);
+      process.exit(v.code as ExitCodes);
     });
   } else if (flags.h || flags.help) {
     printf(chalk`{yellowBright {bold Splatsh}}
@@ -89,18 +87,17 @@ The {green Node.js}-based shell for everyone!
 ---------
 {bold FLAGS}:
   -h, --help\t\tShows this screen
-  -c\t\t\tExecutes arbitary Splatsh code
+  -c\t\t\tExecutes arbitrary Splatsh code
   -d, --debug\t\tShows debug output
   -D\t\t\tShows extended debug output
 `);
     process.exit(0);
   } else if (flags.d || flags.debug || flags.D) {
-    printf("Current direcrory: %s\n", process.cwd());
+    printf("Current directory: %s\n", process.cwd());
   } else {
     const cmd = args.shift() as typeof args[0];
-    const res = await CommandHandler.invoke([cmd, ...args], {});
-    if (res.code !== ExitCodes.SUCCESS) printfErr(res.out);
-    else printf(res.out);
+    const res = await CommandHandler.invoke(parseArgs(`"${[cmd, ...args].join('" "')}"`), {});
+    if (res.out !== void 0) (res.code === ExitCodes.SUCCESS ? printf : printfErr)(res.out);
     process.exit(res.code as ExitCodes);
   }
 }

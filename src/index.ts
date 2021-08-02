@@ -25,15 +25,6 @@ import { ExitCodes } from "./util/constants";
 import { printf, prompt, shortenPath } from "./util/session";
 
 let occupied = true;
-let cwd = process.cwd();
-let oldCwd = cwd;
-export function useCwd() {
-  function setCwd(val: string) {
-    oldCwd = cwd;
-    return (cwd = val);
-  }
-  return [cwd, setCwd, oldCwd] as const;
-}
 
 export function useOccupiedState(): [boolean, (val: boolean) => boolean] {
   function setOccupied(val?: boolean) {
@@ -46,7 +37,7 @@ void CommandHandler.prepare()
   .then(() => resolveBeforeContinuing)
   .then(() => {
     printf(chalk`Welcome to {yellowBright Splatsh}, the {green Node.js}-based terminal client for everyone!\n`);
-    promptShell(shortenPath(cwd));
+    promptShell(shortenPath(process.cwd()));
     occupied = false;
   });
 
@@ -67,41 +58,43 @@ async function handleTypedData() {
   } catch (err) {
     printf(`${err}\n`);
     occupied = false;
-    return promptShell(shortenPath(cwd), ExitCodes.ERROR);
+    return promptShell(shortenPath(process.cwd()), ExitCodes.ERROR);
   }
 
   typing = "";
 
   const commandVariables = {} as Record<string, string>;
 
-  while (args.length && /\w+=[^\s]+/.test(args[0])) {
-    const [key, value] = args.shift()!.split("=");
+  while (args[0].length && /\w+=[^\s]+/.test(args[0][0])) {
+    const [key, value] = args[0].shift()!.split("=");
     commandVariables[key] = value;
   }
 
-  if (!args.length) {
+  if (!args[0].length) {
     for (const [key, value] of Object.entries(commandVariables)) {
       sessionVariables[key] = value;
     }
     occupied = false;
-    return promptShell(shortenPath(cwd), ExitCodes.SUCCESS);
+    return promptShell(shortenPath(process.cwd()), ExitCodes.SUCCESS);
   }
 
   const result = await CommandHandler.invoke(args, commandVariables);
-  printf(result.out);
+  if (result.out !== void 0) printf(result.out);
   printf(result.err || "");
   occupied = false;
-  promptShell(shortenPath(cwd), result.code);
+  promptShell(shortenPath(process.cwd()), result.code);
 }
 
 process.stdin.on("data", data => {
-  if (data.toString() === "\n") return promptShell(shortenPath(cwd), 0);
-  typing = data.toString().slice(0, -1) || "";
+  if (data.toString() === "\n") return promptShell(shortenPath(process.cwd()), 0);
+  typing = data.toString().trim() || "";
   void handleTypedData();
 });
 
 process.on("SIGINT", () => {
-  comment: {
-    break comment;
-  }
+  //
+});
+
+process.on("SIGTTIN", () => {
+  //
 });

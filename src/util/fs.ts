@@ -31,6 +31,10 @@ export function isExecutable(filepath: string) {
   return exists(filepath, FS_CONSTANTS.X_OK);
 }
 
+export function isDir(filepath: string) {
+  return exists(filepath, FS_CONSTANTS.O_DIRECTORY);
+}
+
 export async function findInPath(command: string): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const { PATH } = process.env;
